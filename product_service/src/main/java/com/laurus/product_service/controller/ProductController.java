@@ -1,15 +1,22 @@
 package com.laurus.product_service.controller;
 
+import com.laurus.product_service.entity.Product;
 import com.laurus.product_service.service.ProductService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/product")
 public class ProductController {
 
+    @Value("${server.port}")
+    private String port;
 
     @Autowired
     private ProductService productService;
@@ -30,8 +37,14 @@ public class ProductController {
      * @return
      */
     @RequestMapping("find")
-    public Object findById(@RequestParam("id") int id){
-        return productService.findById(id);
+    public Object findById(@RequestParam("id") int id) throws InterruptedException {
+        //秒SECONDS 小时HOURS 分钟MINUTES
+        TimeUnit.SECONDS.sleep(10);
+        Product product = productService.findById(id);
+        Product result = new Product();
+        BeanUtils.copyProperties(product,result);
+        result.setName(product.getName()+" data from port="+port);
+        return result;
     }
 
 
